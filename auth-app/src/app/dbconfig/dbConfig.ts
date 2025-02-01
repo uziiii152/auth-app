@@ -1,23 +1,31 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-
 dotenv.config();
 
-export async function connect() {
-    try {
-      await mongoose.connect(process.env.MONGO_URI!,{})
+const MONGODB_URI = process.env.MONGODB_URI;
+const dbName = process.env.DB_NAME || "test";
 
-      const connection = mongoose.connection;
+export default async function connect() {
+  if (!MONGODB_URI) {
+    console.error("❌ MONGODB_URI is missing in .env");
+    throw new Error("❌ MONGODB_URI is missing in .env");
+  }
 
-      connection.on('connected', () => {
-        console.log('Connected to the database');
-      });
-      connection.on('error', console.error.bind(console, 'connection error:'));
-        
-
-    } catch (error) {
-        console.log('Error connecting to the database');
-        console.log(error);
-    }
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      dbName, // Specify the database name
+    });
+    console.log("✅ MongoDB Connected Successfully!");
+  } catch (error) {
+    console.error("❌ MongoDB Connection Error:", error);
+    throw error;
+  }
 }
+
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  await mongoose.connection.close();
+  console.log("MongoDB connection closed due to application termination");
+  process.exit(0);
+});
