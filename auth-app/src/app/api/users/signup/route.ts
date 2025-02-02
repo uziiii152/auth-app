@@ -1,4 +1,4 @@
-"use client"
+
 import connect from "@/app/dbconfig/dbConfig"; // Correct import statement for the default export
 import User from "@/models/userModels.js";
 import { NextRequest, NextResponse } from "next/server";

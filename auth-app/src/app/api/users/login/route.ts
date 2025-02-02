@@ -43,13 +43,18 @@ export async function POST(request: NextRequest) {
         username: user.username
     };
 
-    const token = jwt.sign(tokenData, TOKEN_SECRET, { expiresIn: '1h' }); // Use TOKEN_SECRET and add an expiration time
+    const token =await jwt.sign(tokenData, TOKEN_SECRET, { expiresIn: '1h' }); // Use TOKEN_SECRET and add an expiration time
 
-    return NextResponse.json(
+    const response =  NextResponse.json(
         {
             message: "Login successful",
-            token
         },
         { status: 200 }
     );
+
+    response.cookies.set("token",token, {
+        httpOnly: true
+    })
+
+    return response;
 }
