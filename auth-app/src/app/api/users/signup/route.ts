@@ -4,6 +4,7 @@ import User from "@/models/userModels.js";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import mongoose from "mongoose"; // Import for debugging
+import { sendEmail } from "@/helper/mailer";
 
 export async function POST(request: NextRequest) {
     try {
@@ -48,6 +49,10 @@ export async function POST(request: NextRequest) {
 
         const savedUser = await newUser.save();
         console.log("✅ New User Created:", savedUser);
+
+        // send verification email
+
+        await sendEmail({email,emailType:'VERIFY',userId:savedUser._id})
 
         return NextResponse.json(
             { message: "User created successfully", success: true, savedUser },
